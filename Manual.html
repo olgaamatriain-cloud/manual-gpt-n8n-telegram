@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - LinkedIn Proposal AI</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+        th { background: #0077B5; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .gratis { color: green; font-weight: bold; }
+        .pago { color: blue; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>📊 Dashboard - Propuestas Generadas</h1>
+    <p>Total de propuestas: {{ $json.length }}</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Nicho</th>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ $json.map(row => `
+                <tr>
+                    <td>${row.id}</td>
+                    <td>${row.email}</td>
+                    <td>${row.nicho}</td>
+                    <td>${new Date(row.fecha_creacion).toLocaleDateString()}</td>
+                    <td class="${row.es_gratis ? 'gratis' : 'pago'}">
+                        ${row.es_gratis ? '🎁 Gratis' : '💰 Pago'}
+                    </td>
+                    <td>${row.estado}</td>
+                </tr>
+            `).join('') }}
+        </tbody>
+    </table>
+</body>
+</html>
