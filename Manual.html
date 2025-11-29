@@ -1,46 +1,781 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Dashboard - LinkedIn Proposal AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta tu GPT Personalizado con n8n y Telegram</title>
     <style>
-        body { font-family: Arial; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
-        th { background: #0077B5; color: white; }
-        tr:hover { background: #f5f5f5; }
-        .gratis { color: green; font-weight: bold; }
-        .pago { color: blue; font-weight: bold; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .intro {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .section-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #333;
+        }
+        
+        .step {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .step h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .step ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .step li {
+            margin-bottom: 8px;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .warning strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .success strong {
+            color: #155724;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .info strong {
+            color: #0c5460;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .workflow-diagram {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .flow-items {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .flow-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+        }
+        
+        .screenshot-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            color: #666;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        footer {
+            background: #2d2d2d;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .flow-items {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>📊 Dashboard - Propuestas Generadas</h1>
-    <p>Total de propuestas: {{ $json.length }}</p>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Nicho</th>
-                <th>Fecha</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{ $json.map(row => `
-                <tr>
-                    <td>${row.id}</td>
-                    <td>${row.email}</td>
-                    <td>${row.nicho}</td>
-                    <td>${new Date(row.fecha_creacion).toLocaleDateString()}</td>
-                    <td class="${row.es_gratis ? 'gratis' : 'pago'}">
-                        ${row.es_gratis ? '🎁 Gratis' : '💰 Pago'}
-                    </td>
-                    <td>${row.estado}</td>
-                </tr>
-            `).join('') }}
-        </tbody>
-    </table>
+    <div class="container">
+        <header>
+            <h1>🤖 Conecta tu GPT Personalizado con n8n y Telegram</h1>
+            <p>Automatiza el envío de contenido generado por IA directamente a tu Telegram</p>
+            <div style="margin-top: 20px;">
+                <span class="tag">n8n</span>
+                <span class="tag">OpenAI GPT</span>
+                <span class="tag">Telegram</span>
+                <span class="tag">Automatización</span>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="intro">
+                <h2>📋 ¿Qué vamos a conseguir?</h2>
+                <p>En este tutorial aprenderás a crear una automatización completa que te permitirá pedirle a tu GPT personalizado que genere contenido y, simplemente diciendo <strong>"envía a Telegram"</strong>, recibirás ese contenido directamente en tu chat de Telegram.</p>
+                <br>
+                <p><strong>Requisitos previos:</strong></p>
+                <ul>
+                    <li>Cuenta de ChatGPT Plus (para crear GPTs personalizados)</li>
+                    <li>Instancia de n8n funcionando</li>
+                    <li>Cuenta de Telegram</li>
+                </ul>
+            </div>
+            
+            <div class="workflow-diagram">
+                <h3 style="color: #667eea; margin-bottom: 20px;">🔄 Flujo de la Automatización</h3>
+                <div class="flow-items">
+                    <div class="flow-item">👤 Usuario pide contenido al GPT</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item">🤖 GPT genera el contenido</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item">💬 Usuario dice "envía a Telegram"</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item">🔗 GPT llama al webhook de n8n</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item">📱 n8n envía a Telegram</div>
+                </div>
+            </div>
+            
+            <!-- PASO 1: CREAR BOT DE TELEGRAM -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <h2 class="section-title">Crear tu Bot de Telegram</h2>
+                </div>
+                
+                <div class="step">
+                    <h3>1.1 Busca a BotFather</h3>
+                    <p>Abre Telegram y busca <span class="highlight">@BotFather</span> (es el bot oficial de Telegram para crear bots)</p>
+                    <div class="info">
+                        <strong>💡 Tip:</strong>
+                        Asegúrate de que es el BotFather oficial (tiene la verificación azul)
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>1.2 Crea un nuevo bot</h3>
+                    <p>Envía el comando:</p>
+                    <div class="code-block">
+                        <pre>/newbot</pre>
+                    </div>
+                    <p>BotFather te pedirá:</p>
+                    <ul>
+                        <li><strong>Nombre del bot:</strong> Por ejemplo "Mi Asistente GPT"</li>
+                        <li><strong>Username del bot:</strong> Debe terminar en "bot", por ejemplo "miasistente_gpt_bot"</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>1.3 Guarda tu Token</h3>
+                    <p>BotFather te dará un <strong>token de acceso HTTP API</strong> que se ve algo así:</p>
+                    <div class="code-block">
+                        <pre>1234567890:ABCdefGHIjklMNOpqrsTUVwxyz1234567890</pre>
+                    </div>
+                    <div class="warning">
+                        <strong>⚠️ ¡MUY IMPORTANTE!</strong>
+                        Guarda este token en un lugar seguro. No lo compartas con nadie. Lo necesitarás para configurar n8n.
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>1.4 Obtén tu Chat ID</h3>
+                    <p>Necesitas tu ID personal de Telegram para que el bot te envíe mensajes:</p>
+                    <ol>
+                        <li>Busca en Telegram el bot <span class="highlight">@userinfobot</span></li>
+                        <li>Envíale cualquier mensaje</li>
+                        <li>Te responderá con tu información, incluyendo tu <strong>Chat ID</strong> (un número)</li>
+                        <li>Guarda ese número, lo necesitarás después</li>
+                    </ol>
+                    <div class="code-block">
+                        <pre>Ejemplo de Chat ID: 123456789</pre>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>1.5 Inicia conversación con tu bot</h3>
+                    <p>Busca tu bot recién creado en Telegram y pulsa <strong>Start</strong> o envíale cualquier mensaje. Esto es necesario para que el bot pueda enviarte mensajes.</p>
+                </div>
+            </div>
+            
+            <!-- PASO 2: CONFIGURAR N8N -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <h2 class="section-title">Configurar el Workflow en n8n</h2>
+                </div>
+                
+                <div class="step">
+                    <h3>2.1 Crear un nuevo workflow</h3>
+                    <p>Entra a tu n8n y crea un nuevo workflow. Dale un nombre descriptivo como "GPT a Telegram"</p>
+                </div>
+                
+                <div class="step">
+                    <h3>2.2 Añadir el nodo Webhook</h3>
+                    <p>Busca y añade el nodo <strong>Webhook</strong></p>
+                    <p><strong>Configuración del webhook:</strong></p>
+                    <ul>
+                        <li><strong>HTTP Method:</strong> POST</li>
+                        <li><strong>Path:</strong> <span class="highlight">gpt-telegram</span> (o el nombre que prefieras)</li>
+                        <li><strong>Authentication:</strong> None (para simplificar)</li>
+                        <li><strong>Respond:</strong> Immediately</li>
+                    </ul>
+                    <div class="info">
+                        <strong>💡 Nota:</strong>
+                        Una vez configurado, copia la URL del webhook. Se verá algo así:<br>
+                        <code>https://tu-dominio-n8n.com/webhook/gpt-telegram</code>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>2.3 Añadir credenciales de Telegram</h3>
+                    <p>Antes de añadir el nodo de Telegram, necesitas configurar las credenciales:</p>
+                    <ol>
+                        <li>Ve a <strong>Settings</strong> (rueda dentada) → <strong>Credentials</strong></li>
+                        <li>Click en <strong>New</strong></li>
+                        <li>Busca y selecciona <strong>Telegram API</strong></li>
+                        <li>Pega el <strong>Token</strong> que te dio BotFather</li>
+                        <li>Dale un nombre descriptivo (ej: "Mi Bot GPT")</li>
+                        <li>Guarda las credenciales</li>
+                    </ol>
+                </div>
+                
+                <div class="step">
+                    <h3>2.4 Añadir el nodo Telegram</h3>
+                    <p>Conecta un nodo <strong>Telegram</strong> después del Webhook</p>
+                    <p><strong>Configuración del nodo Telegram:</strong></p>
+                    <ul>
+                        <li><strong>Credential:</strong> Selecciona las credenciales que acabas de crear</li>
+                        <li><strong>Resource:</strong> Message</li>
+                        <li><strong>Operation:</strong> Send Message</li>
+                        <li><strong>Chat ID:</strong> Pega tu Chat ID (el número que obtuviste de @userinfobot)</li>
+                        <li><strong>Text:</strong> Aquí mapeas el contenido del webhook</li>
+                    </ul>
+                    
+                    <div class="info">
+                        <strong>💡 Mapear el contenido:</strong>
+                        En el campo "Text", haz click en el icono de expresiones y selecciona:
+                    </div>
+                    <div class="code-block">
+                        <pre>{{ $json.content }}</pre>
+                    </div>
+                    <p>Esto tomará el contenido que envíe el GPT y lo reenviará a Telegram</p>
+                </div>
+                
+                <div class="step">
+                    <h3>2.5 Activar el workflow</h3>
+                    <p>No olvides <strong>activar</strong> el workflow usando el toggle en la parte superior derecha</p>
+                    <div class="success">
+                        <strong>✅ ¡Workflow listo!</strong>
+                        Tu n8n ya está preparado para recibir contenido del GPT y enviarlo a Telegram
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PASO 3: CONFIGURAR GPT PERSONALIZADO -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <h2 class="section-title">Configurar tu GPT Personalizado</h2>
+                </div>
+                
+                <div class="step">
+                    <h3>3.1 Acceder a la creación de GPTs</h3>
+                    <p>Ve a ChatGPT y accede a:</p>
+                    <ul>
+                        <li>Click en tu perfil (esquina superior derecha)</li>
+                        <li>Selecciona <strong>"My GPTs"</strong></li>
+                        <li>Click en <strong>"Create a GPT"</strong></li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>3.2 Configuración básica del GPT</h3>
+                    <p>Dale un nombre y descripción a tu GPT. Por ejemplo:</p>
+                    <ul>
+                        <li><strong>Nombre:</strong> "Creador de Contenido con Telegram"</li>
+                        <li><strong>Descripción:</strong> "Genera contenido y envíalo directamente a Telegram"</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>3.3 Añadir las instrucciones</h3>
+                    <p>En el campo de instrucciones, añade algo como:</p>
+                    <div class="code-block">
+                        <pre>Eres un asistente experto en crear contenido para redes sociales.
+
+Cuando el usuario te pida "envía a telegram", "manda a telegram", 
+"envíalo a telegram" o similar, debes usar la acción enviarTelegram 
+para enviar el último contenido que generaste.
+
+El contenido debe enviarse tal cual lo generaste, sin modificaciones.</pre>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>3.4 Configurar la acción (Action)</h3>
+                    <p>Ve a la pestaña <strong>"Configure"</strong> y luego a <strong>"Actions"</strong></p>
+                    <ol>
+                        <li>Click en <strong>"Create new action"</strong></li>
+                        <li>En el campo de schema, pega el siguiente JSON:</li>
+                    </ol>
+                    
+                    <div class="code-block">
+                        <pre>{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Enviar a Telegram",
+    "version": "1.0.0",
+    "description": "Envía contenido generado a Telegram vía n8n"
+  },
+  "servers": [
+    {
+      "url": "https://TU-DOMINIO-N8N.com"
+    }
+  ],
+  "paths": {
+    "/webhook/gpt-telegram": {
+      "post": {
+        "operationId": "enviarTelegram",
+        "summary": "Envía contenido a Telegram",
+        "description": "Recibe contenido y lo envía al chat de Telegram configurado",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "El contenido a enviar a Telegram"
+                  }
+                },
+                "required": ["content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contenido enviado correctamente a Telegram"
+          }
+        }
+      }
+    }
+  }
+}</pre>
+                    </div>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Importante:</strong>
+                        Reemplaza <code>https://TU-DOMINIO-N8N.com</code> con la URL real de tu instancia de n8n
+                    </div>
+                    
+                    <div class="warning">
+                        <strong>⚠️ Verifica la ruta:</strong>
+                        Asegúrate de que <code>/webhook/gpt-telegram</code> coincida exactamente con el path que configuraste en el webhook de n8n
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>3.5 Configurar privacidad de la acción</h3>
+                    <p>Debajo del schema verás opciones de privacidad:</p>
+                    <ul>
+                        <li>Si es solo para ti: selecciona <strong>"Only me"</strong></li>
+                        <li>Si quieres que otros lo usen: selecciona la opción apropiada</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>3.6 Guardar y publicar</h3>
+                    <p>Click en <strong>"Update"</strong> o <strong>"Create"</strong> para guardar tu GPT</p>
+                    <div class="success">
+                        <strong>✅ ¡GPT configurado!</strong>
+                        Tu GPT personalizado ya está listo para enviar contenido a Telegram
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PASO 4: PROBAR LA AUTOMATIZACIÓN -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <h2 class="section-title">Probar tu Automatización</h2>
+                </div>
+                
+                <div class="step">
+                    <h3>4.1 Primera prueba</h3>
+                    <p>Abre tu GPT personalizado y prueba con algo como:</p>
+                    <div class="code-block">
+                        <pre>Escribe un post motivacional para Instagram sobre perseverancia</pre>
+                    </div>
+                    <p>El GPT generará el contenido.</p>
+                </div>
+                
+                <div class="step">
+                    <h3>4.2 Enviar a Telegram</h3>
+                    <p>Una vez generado el contenido, simplemente escribe:</p>
+                    <div class="code-block">
+                        <pre>Envía a telegram</pre>
+                    </div>
+                    <p>O cualquier variante como:</p>
+                    <ul>
+                        <li>"Manda esto a telegram"</li>
+                        <li>"Envíalo a mi telegram"</li>
+                        <li>"Telegram"</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>4.3 Verificar en Telegram</h3>
+                    <p>Abre tu Telegram y verifica que has recibido el mensaje de tu bot con el contenido generado</p>
+                    <div class="success">
+                        <strong>✅ ¡Funciona!</strong>
+                        Si recibes el mensaje, ¡tu automatización está lista!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SOLUCIÓN DE PROBLEMAS -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <h2 class="section-title">Solución de Problemas</h2>
+                </div>
+                
+                <div class="step">
+                    <h3>🔧 No recibo mensajes en Telegram</h3>
+                    <p><strong>Posibles causas:</strong></p>
+                    <ul>
+                        <li>Verifica que activaste el workflow en n8n (toggle superior derecha)</li>
+                        <li>Asegúrate de haber iniciado conversación con tu bot (botón Start)</li>
+                        <li>Verifica que el Chat ID sea correcto</li>
+                        <li>Comprueba que el token del bot esté bien configurado en n8n</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>🔧 El GPT no envía nada</h3>
+                    <p><strong>Posibles causas:</strong></p>
+                    <ul>
+                        <li>Verifica que la URL en el schema del GPT sea correcta</li>
+                        <li>Asegúrate de que el path del webhook coincida exactamente</li>
+                        <li>Revisa las ejecuciones en n8n para ver si llegan peticiones</li>
+                        <li>Verifica que las instrucciones del GPT sean claras</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>🔧 Error de conexión en n8n</h3>
+                    <p><strong>Posibles causas:</strong></p>
+                    <ul>
+                        <li>Verifica que tu n8n sea accesible públicamente</li>
+                        <li>Asegúrate de que no hay restricciones de firewall</li>
+                        <li>Comprueba que el certificado SSL esté funcionando</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>🔧 Revisar logs en n8n</h3>
+                    <p>Para diagnosticar problemas:</p>
+                    <ul>
+                        <li>Ve a tu workflow en n8n</li>
+                        <li>Click en el menú de tres puntos → "Executions"</li>
+                        <li>Revisa las ejecuciones fallidas para ver el error específico</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- MEJORAS Y PERSONALIZACIONES -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <h2 class="section-title">Mejoras y Personalizaciones</h2>
+                </div>
+                
+                <div class="step">
+                    <h3>💡 Formato mejorado en Telegram</h3>
+                    <p>Puedes hacer que los mensajes se vean mejor usando formato Markdown:</p>
+                    <p>En el nodo de Telegram, activa la opción:</p>
+                    <ul>
+                        <li><strong>Parse Mode:</strong> Markdown</li>
+                    </ul>
+                    <p>Y modifica el contenido para añadir formato:</p>
+                    <div class="code-block">
+                        <pre>*{{ $json.content }}*
+
+---
+✨ Generado por mi GPT personalizado</pre>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <h3>💡 Guardar en base de datos</h3>
+                    <p>Puedes añadir un nodo adicional para guardar todo el contenido generado:</p>
+                    <ul>
+                        <li>Añade un nodo de PostgreSQL, MySQL o la base de datos que uses</li>
+                        <li>Guarda el contenido junto con fecha y hora</li>
+                        <li>Así tendrás un historial de todo lo generado</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>💡 Enviar a múltiples destinos</h3>
+                    <p>Puedes ramificar el workflow para enviar el contenido a:</p>
+                    <ul>
+                        <li>Email (usando nodo de Email)</li>
+                        <li>Google Sheets (para llevar registro)</li>
+                        <li>Slack (para equipos)</li>
+                        <li>Discord (para comunidades)</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>💡 Añadir autenticación</h3>
+                    <p>Para mayor seguridad, puedes añadir autenticación al webhook:</p>
+                    <ul>
+                        <li>En el nodo Webhook, activa "Header Auth"</li>
+                        <li>Define un header secreto (ej: "X-API-Key")</li>
+                        <li>Añade ese header en el schema del GPT</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <h3>💡 Crear diferentes tipos de contenido</h3>
+                    <p>Puedes crear varios GPTs especializados:</p>
+                    <ul>
+                        <li>GPT para posts de Instagram</li>
+                        <li>GPT para tweets</li>
+                        <li>GPT para emails de marketing</li>
+                        <li>Cada uno enviando a diferentes canales de Telegram o diferentes destinos</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- CONCLUSIÓN -->
+            <div class="section">
+                <div class="intro">
+                    <h2>🎉 ¡Felicidades!</h2>
+                    <p>Has creado tu primera automatización completa conectando GPT personalizado con n8n y Telegram. Ahora puedes:</p>
+                    <ul style="margin-top: 15px;">
+                        <li>✅ Generar contenido con IA</li>
+                        <li>✅ Enviarlo automáticamente a Telegram</li>
+                        <li>✅ Personalizar y expandir esta automatización</li>
+                        <li>✅ Aplicar estos conocimientos a otros proyectos</li>
+                    </ul>
+                    <br>
+                    <p><strong>Próximos pasos:</strong></p>
+                    <ul>
+                        <li>Experimenta con diferentes tipos de contenido</li>
+                        <li>Explora otras integraciones de n8n</li>
+                        <li>Comparte tus automatizaciones con la comunidad</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>📚 Manual creado para la comunidad FDP</p>
+            <p>🔧 Herramientas: n8n + OpenAI GPT + Telegram</p>
+            <p style="margin-top: 20px; opacity: 0.7;">¿Tienes dudas o mejoras? ¡Comparte este manual y ayuda a otros!</p>
+        </footer>
+    </div>
 </body>
 </html>
